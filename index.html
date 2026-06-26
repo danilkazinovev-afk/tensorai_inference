@@ -204,6 +204,25 @@
     .copy-btn { background: none; border: none; cursor: pointer; color: var(--body);
       display: inline-flex; padding: 2px; flex: none; }
     .copy-btn:hover { color: var(--ink); }
+
+    /* "copied" toast - slides down from the top of the viewport */
+    .toast {
+      position: fixed; top: 20px; left: 50%; z-index: 200;
+      transform: translateX(-50%) translateY(-24px);
+      background: var(--ink); color: var(--on-primary);
+      font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 10px 18px; border-radius: var(--r-sm);
+      display: inline-flex; align-items: center; gap: var(--s-sm);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast svg { width: 14px; height: 14px; }
+    @media (prefers-reduced-motion: reduce) {
+      .toast { transition: opacity 0.2s ease; transform: translateX(-50%); }
+    }
+
     .hero-actions { display: flex; gap: var(--s-md); justify-content: center; flex-wrap: wrap; }
     .hero-tag { margin-top: var(--s-xl); color: var(--mute); font-family: var(--font-mono);
       font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -341,8 +360,32 @@
       .cta-strip { flex-direction: column; align-items: flex-start; padding: var(--s-xl); }
       .cta-strip .btn { width: 100%; height: 44px; }
 
-      /* hint that the pricing table scrolls sideways */
-      .table-scroll { border-right: 1px solid var(--hairline); }
+      /* pricing table reflows into stacked cards - no horizontal scroll */
+      .table-scroll { overflow-x: visible; }
+      table.pricing { min-width: 0; }
+      table.pricing thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } /* visually hidden, kept for a11y */
+      table.pricing, table.pricing tbody, table.pricing tr, table.pricing td { display: block; width: 100%; }
+      table.pricing tr {
+        border: 1px solid var(--hairline); border-radius: var(--r-lg);
+        padding: var(--s-lg); margin-bottom: var(--s-md);
+      }
+      table.pricing tbody tr:hover { background: transparent; }
+      table.pricing td { border: none; padding: 0; }
+      table.pricing td.model {
+        font-size: 16px; font-weight: 600; min-width: 0; padding: 0 0 var(--s-sm);
+        margin-bottom: var(--s-sm); border-bottom: 1px solid var(--hairline);
+      }
+      table.pricing td.num {
+        display: flex; align-items: baseline; justify-content: space-between;
+        padding: var(--s-xs) 0; text-align: right;
+      }
+      table.pricing td.num::before {
+        font-family: var(--font-mono); font-weight: 700; font-size: 12px;
+        text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute);
+      }
+      table.pricing td.num:nth-child(2)::before { content: "Input"; }
+      table.pricing td.num:nth-child(3)::before { content: "Output"; }
+      table.pricing td.num:nth-child(4)::before { content: "Cached"; }
       .foot-inner { gap: var(--s-md) var(--s-lg); }
     }
   </style>
@@ -566,14 +609,37 @@
     </div>
   </footer>
 
+  <!-- copy confirmation toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+    Copied
+  </div>
+
   <script>
     (function () {
-      // copy install command
+      // copy install command + "copied" toast
       var btn = document.getElementById('copy-btn');
       var cmd = document.getElementById('install-cmd');
-      if (btn && cmd && navigator.clipboard) {
+      var toast = document.getElementById('toast');
+      var toastTimer;
+      function showToast() {
+        if (!toast) return;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 1600);
+      }
+      if (btn && cmd) {
         btn.addEventListener('click', function () {
-          navigator.clipboard.writeText(cmd.innerText);
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(cmd.innerText);
+          } else {
+            // fallback for non-secure contexts
+            var sel = window.getSelection(), range = document.createRange();
+            range.selectNodeContents(cmd); sel.removeAllRanges(); sel.addRange(range);
+            try { document.execCommand('copy'); } catch (e) {}
+            sel.removeAllRanges();
+          }
+          showToast();
         });
       }
 
