@@ -128,8 +128,24 @@
       border: 1px solid transparent; cursor: pointer; white-space: nowrap;
       text-decoration: none; transition: background-color .12s ease, border-color .12s ease, color .12s ease;
     }
-    .btn-primary { background: var(--primary); color: var(--on-primary); }
+    .btn-primary {
+      background: var(--primary); color: var(--on-primary);
+      position: relative; overflow: hidden; isolation: isolate;
+    }
     .btn-primary:active { background: var(--ink-deep); }
+    /* moving "mirror" - a soft specular highlight that follows the cursor on hover.
+       z-index:-1 keeps it above the black fill but below the white label, so text stays crisp. */
+    .btn-primary::before {
+      content: "";
+      position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      background: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+                  rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 35%, transparent 62%);
+      opacity: 0; transition: opacity 0.25s ease;
+    }
+    .btn-primary:hover::before { opacity: 1; }
+    @media (prefers-reduced-motion: reduce) {
+      .btn-primary::before { transition: none; }
+    }
     .btn-secondary { background: var(--canvas); color: var(--ink); border-color: var(--hairline-strong); }
     .btn-secondary:active { border-color: var(--ink); }
     .btn-on-dark { background: var(--canvas); color: var(--ink); }
@@ -560,6 +576,16 @@
           navigator.clipboard.writeText(cmd.innerText);
         });
       }
+
+      // moving "mirror" highlight on black CTAs - track the cursor within each button
+      var mirrors = document.querySelectorAll('.btn-primary');
+      mirrors.forEach(function (b) {
+        b.addEventListener('pointermove', function (e) {
+          var r = b.getBoundingClientRect();
+          b.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+          b.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        });
+      });
 
       // mobile nav dropdown
       var toggle = document.getElementById('nav-toggle');
