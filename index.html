@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TENSORAI — The easiest way to ship with open models</title>
+  <meta name="description" content="A nimble 3-person San Francisco team reselling LLM inference at honest rates. OpenAI-compatible, live in minutes, no lock-in." />
+
+  <!-- Clash Display (headings) · DM Sans (body + pricing numbers) · Space Mono (uppercase labels + code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* colors */
+      --primary:        #000000;
+      --on-primary:     #ffffff;
+      --ink:            #000000;
+      --ink-deep:       #090909;
+      --charcoal:       #525252;
+      --body:           #737373;
+      --mute:           #a3a3a3;
+      --canvas:         #ffffff;
+      --surface-soft:   #fafafa;
+      --surface-dark:   #171717;
+      --hairline:       #e5e5e5;
+      --hairline-strong:#d4d4d4;
+      --on-dark:        #ffffff;
+      --on-dark-mute:   rgba(255,255,255,0.7);
+      --focus-ring:     rgba(59,130,246,0.5);
+      --term-red:       #ff5f56;
+      --term-yellow:    #ffbd2e;
+      --term-green:     #27c93f;
+
+      /* radii */
+      --r-sm: 6px;
+      --r-md: 8px;
+      --r-lg: 12px;
+      --r-full: 9999px;
+
+      /* spacing */
+      --s-xxs: 2px; --s-xs: 4px; --s-sm: 8px; --s-md: 12px;
+      --s-lg: 16px; --s-xl: 24px; --s-xxl: 32px; --s-section: 88px;
+
+      /* fonts */
+      --font-display: "Clash Display", "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      /* Space Mono, 700, uppercase — small structural labels */
+      --label: 700 12px/1.33 var(--font-mono);
+
+      --content: 720px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* focus ring — the only blue in the system */
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    .wrap { width: 86%; max-width: 1100px; margin: 0 auto; padding: 0 var(--s-xl); }
+    .wrap-wide { width: 90%; max-width: 1240px; margin: 0 auto; padding: 0 var(--s-xl); }
+
+    /* ---------- typography ---------- */
+    h1, h2, h3 { margin: 0; font-family: var(--font-display); letter-spacing: -0.01em; }
+    .display-xl { font-size: clamp(28px, 6vw, 36px); font-weight: 700; line-height: 1.12; }
+    .display-lg { font-size: clamp(24px, 4.5vw, 30px); font-weight: 600; line-height: 1.2; }
+    .heading-lg { font-size: 24px; font-weight: 600; line-height: 1.33; }
+    .heading-md { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1.4; }
+    .heading-sm { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.56; }
+
+    /* animated moving-gradient word — blue → green → orange → pink, wandering loop */
+    .gradient-word {
+      display: inline-block;
+      background-image: linear-gradient(115deg, #3B82F6 0%, #10B981 28%, #F97316 56%, #EC4899 82%, #3B82F6 100%);
+      background-size: 320% 320%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation: gradient-drift 9s ease-in-out infinite;
+    }
+    /* color drift across a 2D field — vertical + diagonal sweeps */
+    @keyframes gradient-drift {
+      0%   { background-position: 0% 50%; }
+      20%  { background-position: 85% 0%; }
+      40%  { background-position: 100% 100%; }
+      60%  { background-position: 20% 90%; }
+      80%  { background-position: 70% 5%; }
+      100% { background-position: 0% 50%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .gradient-word { animation: none; }
+    }
+    p { margin: 0; }
+    .body-md { font-size: 16px; line-height: 1.5; }
+    .body-sm { font-size: 14px; line-height: 1.43; }
+    .caption { font-size: 12px; line-height: 1.33; }
+    .t-body { color: var(--body); }
+    .t-charcoal { color: var(--charcoal); }
+    .t-mute { color: var(--mute); }
+
+    /* ---------- llama mascot ---------- */
+    .llama { display: block; }
+    .llama path, .llama line, .llama circle { vector-effect: non-scaling-stroke; }
+
+    /* ---------- buttons (pills) ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: var(--font-sans); font-size: 14px; font-weight: 500; line-height: 1;
+      height: 36px; padding: 8px 20px; border-radius: var(--r-sm);
+      border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+      text-decoration: none; transition: background-color .12s ease, border-color .12s ease, color .12s ease;
+    }
+    .btn-primary { background: var(--primary); color: var(--on-primary); }
+    .btn-primary:active { background: var(--ink-deep); }
+    .btn-secondary { background: var(--canvas); color: var(--ink); border-color: var(--hairline-strong); }
+    .btn-secondary:active { border-color: var(--ink); }
+    .btn-on-dark { background: var(--canvas); color: var(--ink); }
+
+    /* ---------- nav ---------- */
+    header.nav {
+      position: sticky; top: 0; z-index: 20;
+      height: 56px; background: var(--canvas); border-bottom: 1px solid var(--hairline);
+    }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 var(--s-xl); height: 56px;
+      display: flex; align-items: center; gap: var(--s-xl); }
+    .nav-brand { display: flex; align-items: center; gap: var(--s-sm); font-weight: 700;
+      font-family: var(--font-display); font-size: 17px; color: var(--ink); text-decoration: none; }
+    .nav-links { display: flex; gap: var(--s-xl); }
+    .nav-links a { font-size: 14px; font-weight: 500; color: var(--ink); text-decoration: none; }
+    .nav-links a:hover { color: var(--body); }
+    .search-pill {
+      flex: 0 1 320px; height: 36px; display: flex; align-items: center; gap: var(--s-sm);
+      background: var(--surface-soft); border: 1px solid transparent; border-radius: var(--r-full);
+      padding: 8px 16px; color: var(--mute); font-size: 14px; margin-left: auto;
+    }
+    .search-pill input {
+      border: none; background: transparent; outline: none; width: 100%;
+      font-family: var(--font-sans); font-size: 14px; color: var(--ink);
+    }
+    .nav-right { display: flex; align-items: center; gap: var(--s-md); }
+    .nav-signin { font-size: 14px; font-weight: 500; color: var(--ink); text-decoration: none; }
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: var(--ink); }
+
+    /* mobile dropdown menu (hidden until toggled on small screens) */
+    .mobile-menu { display: none; }
+    .mobile-menu a {
+      font-family: var(--font-sans); font-size: 16px; font-weight: 500;
+      color: var(--ink); text-decoration: none; padding: var(--s-md) 0;
+    }
+    .mobile-menu a.btn { color: var(--on-primary); margin-top: var(--s-sm); }
+
+    /* ---------- sections ---------- */
+    section { padding: var(--s-section) 0; }
+    .section-head { text-align: center; max-width: 720px; margin: 0 auto var(--s-xxl); }
+    .section-head h2 { margin-bottom: var(--s-md); }
+    .section-head p { color: var(--body); }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 72px 0 var(--s-section); text-align: center; }
+    .hero h1 { max-width: 28ch; margin: 0 auto var(--s-lg); }
+    .hero .sub { color: var(--body); max-width: 64ch; margin: 0 auto var(--s-xl); }
+    .install-snippet {
+      display: inline-flex; align-items: center; gap: var(--s-lg);
+      max-width: 100%; height: 48px; padding: 12px 20px; margin: 0 auto var(--s-lg);
+      background: var(--surface-soft); border-radius: var(--r-full);
+      font-family: var(--font-mono); font-size: 16px; color: var(--ink);
+    }
+    .install-snippet .prompt { color: var(--mute); }
+    .install-snippet code { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .copy-btn { background: none; border: none; cursor: pointer; color: var(--body);
+      display: inline-flex; padding: 2px; flex: none; }
+    .copy-btn:hover { color: var(--ink); }
+    .hero-actions { display: flex; gap: var(--s-md); justify-content: center; flex-wrap: wrap; }
+    .hero-tag { margin-top: var(--s-xl); color: var(--mute); font-family: var(--font-mono);
+      font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* ---------- automate split ---------- */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-section); align-items: center; }
+    .split h2 { margin-bottom: var(--s-lg); }
+    .split p { color: var(--body); margin-bottom: var(--s-lg); }
+    .command-tag {
+      display: inline-block; background: var(--surface-soft); border-radius: var(--r-full);
+      padding: 6px 12px; font-family: var(--font-mono); font-size: 14px; color: var(--ink);
+    }
+
+    /* ---------- terminal card ---------- */
+    .terminal-card {
+      background: var(--canvas); border: 1px solid var(--hairline); border-radius: var(--r-lg);
+      padding: var(--s-lg); overflow: hidden;
+    }
+    .term-lights { display: flex; gap: var(--s-xs); margin-bottom: var(--s-md); }
+    .term-lights i { width: 12px; height: 12px; border-radius: var(--r-full); display: block; }
+    .term-lights i:nth-child(1) { background: var(--term-red); }
+    .term-lights i:nth-child(2) { background: var(--term-yellow); }
+    .term-lights i:nth-child(3) { background: var(--term-green); }
+    .terminal-card pre { margin: 0; overflow-x: auto; }
+    .terminal-card code {
+      font-family: var(--font-mono); font-size: 14px; line-height: 1.6; color: var(--ink);
+      white-space: pre;
+    }
+    .terminal-card .cmt { color: var(--mute); }
+    .terminal-card .out { color: var(--body); }
+
+    /* ---------- why us ---------- */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-xl); }
+    .why-item h3 { margin-bottom: var(--s-sm); }
+    .why-item p { color: var(--body); }
+
+    /* ---------- pricing table ---------- */
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table.pricing { width: 100%; border-collapse: collapse; min-width: 560px; }
+    table.pricing thead th {
+      text-align: left; font: var(--label); font-family: var(--font-mono); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute);
+      padding: 0 0 var(--s-md); border-bottom: 1px solid var(--hairline-strong); white-space: nowrap;
+    }
+    table.pricing thead th.num { text-align: right; padding-left: var(--s-lg); }
+    table.pricing tbody td {
+      padding: var(--s-lg) 0; border-bottom: 1px solid var(--hairline); font-size: 14px; vertical-align: middle;
+    }
+    table.pricing td.model { color: var(--ink); font-weight: 500; padding-right: var(--s-lg); min-width: 220px; }
+    table.pricing td.model .variant { color: var(--mute); font-weight: 400; }
+    table.pricing td.num {
+      font-family: var(--font-sans); font-weight: 500; text-align: right; color: var(--ink);
+      white-space: nowrap; font-variant-numeric: tabular-nums; padding-left: var(--s-lg);
+    }
+    table.pricing td.num a { color: var(--ink); text-decoration: underline; }
+    .price-foot { margin-top: var(--s-lg); color: var(--body); font-size: 14px; }
+    .price-foot a { color: var(--ink); text-decoration: underline; }
+
+    /* ---------- data stays yours ---------- */
+    .privacy { text-align: center; }
+    .privacy .lock { width: 40px; height: 40px; margin: 0 auto var(--s-lg); }
+    .privacy h2 { margin-bottom: var(--s-md); }
+    .privacy p { color: var(--body); max-width: 68ch; margin: 0 auto; }
+
+    /* ---------- faq ---------- */
+    .faq { max-width: 880px; margin: 0 auto; }
+    .faq-row { padding: var(--s-lg) 0; border-bottom: 1px solid var(--hairline); }
+    .faq-row .q { color: var(--ink); margin-bottom: var(--s-xs); }
+    .faq-row .a { color: var(--body); }
+    .faq-row .a a { color: var(--body); text-decoration: underline; }
+
+    /* ---------- dark CTA strip (the single inverted moment) ---------- */
+    .cta-strip {
+      background: var(--surface-dark); border-radius: var(--r-lg); padding: var(--s-xl) var(--s-xxl);
+      display: flex; align-items: center; justify-content: space-between; gap: var(--s-xl); flex-wrap: wrap;
+    }
+    .cta-strip h2 { color: var(--on-dark); }
+    .cta-strip p { color: var(--on-dark-mute); margin-top: var(--s-xs); }
+
+    /* ---------- footer ---------- */
+    footer { border-top: 1px solid var(--hairline); padding: var(--s-xxl) var(--s-xl); }
+    .foot-inner {
+      max-width: 960px; margin: 0 auto; display: flex; align-items: center;
+      justify-content: center; gap: var(--s-lg) var(--s-xl); flex-wrap: wrap;
+    }
+    .foot-inner a { color: var(--body); font-family: var(--font-mono); font-weight: 700;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none; }
+    .foot-inner a:hover { color: var(--ink); }
+    .foot-inner .copy { color: var(--mute); font-family: var(--font-mono); font-weight: 700;
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; margin-left: auto; }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 850px) {
+      .why-grid { grid-template-columns: 1fr; gap: var(--s-xxl); text-align: center; }
+      .split { grid-template-columns: 1fr; gap: var(--s-xxl); }
+    }
+
+    /* tablet → phone: collapse nav into a toggled dropdown */
+    @media (max-width: 768px) {
+      .nav-links, .search-pill, .nav-signin { display: none; }
+      .nav-right { margin-left: auto; gap: var(--s-sm); }
+      .nav-cta { display: none; }              /* CTA moves into the menu */
+      .nav-toggle { display: inline-flex; }
+      .mobile-menu.open {
+        display: flex; flex-direction: column;
+        padding: var(--s-md) var(--s-xl) var(--s-xl);
+        border-bottom: 1px solid var(--hairline); background: var(--canvas);
+      }
+      .mobile-menu a { border-bottom: 1px solid var(--hairline); }
+      .mobile-menu a:last-child { border-bottom: none; }
+      .mobile-menu a.btn { justify-content: center; height: 44px; }
+      section { padding: 64px 0; }
+      .foot-inner { justify-content: flex-start; }
+      .foot-inner .copy { margin-left: 0; width: 100%; }
+    }
+
+    /* phone */
+    @media (max-width: 640px) {
+      .wrap, .wrap-wide { width: 92%; padding: 0 var(--s-lg); }
+      section { padding: 48px 0; }
+      .hero { padding: 48px 0 56px; }
+
+      /* install snippet wraps instead of truncating, and grows to fit */
+      .install-snippet {
+        display: flex; width: 100%; height: auto; font-size: 13px;
+        gap: var(--s-md); padding: var(--s-md) var(--s-lg); align-items: flex-start;
+      }
+      .install-snippet code { white-space: normal; overflow: visible; word-break: break-all; }
+      .install-snippet .prompt { padding-top: 1px; }
+
+      /* full-width, comfortably tappable hero buttons */
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions .btn { width: 100%; height: 44px; }
+
+      .cta-strip { flex-direction: column; align-items: flex-start; padding: var(--s-xl); }
+      .cta-strip .btn { width: 100%; height: 44px; }
+
+      /* hint that the pricing table scrolls sideways */
+      .table-scroll { border-right: 1px solid var(--hairline); }
+      .foot-inner { gap: var(--s-md) var(--s-lg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ NAV ============ -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="#top">TENSORAI</a>
+      <nav class="nav-links">
+        <a href="#why">Models</a>
+        <a href="#quickstart">Docs</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+      <div class="search-pill" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input type="text" placeholder="Search models" aria-label="Search models" />
+      </div>
+      <div class="nav-right">
+        <a class="nav-signin" href="#">Sign in</a>
+        <a class="btn btn-primary nav-cta" href="#">Get an API key</a>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile">
+      <a href="#why">Models</a>
+      <a href="#quickstart">Docs</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Sign in</a>
+      <a class="btn btn-primary" href="#">Get an API key</a>
+    </nav>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <h1 class="display-xl">The <span class="gradient-word">easiest</span> way to ship with open models</h1>
+      <p class="sub body-md">A nimble three-person team in San Francisco, reselling LLM inference at honest rates. Standard REST API, live in minutes, no lock-in.</p>
+
+      <div class="install-snippet">
+        <span class="prompt">$</span>
+        <code id="install-cmd">pip install tensorai &amp;&amp; export TENSORAI_API_KEY=sk-...</code>
+        <button class="copy-btn" id="copy-btn" aria-label="Copy install command">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        </button>
+      </div>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#">Get an API key</a>
+        <a class="btn btn-secondary" href="#pricing">View pricing</a>
+      </div>
+      <p class="hero-tag">Simple REST API · 16 models live · pay per token</p>
+    </div>
+  </section>
+
+  <!-- ============ AUTOMATE / QUICK START SPLIT ============ -->
+  <section id="quickstart">
+    <div class="wrap-wide">
+      <div class="split">
+        <div>
+          <h2 class="heading-lg">Drop in. Keep your stack.</h2>
+          <p class="body-md">A plain HTTP API over the open models you already know. Point your client at our endpoint, set your key, and you're sending requests. Nothing new to adopt, no migration, no lock-in.</p>
+          <span class="command-tag">base_url = https://api.tensorai.com/v1</span>
+          <p class="caption t-mute" style="margin-top: var(--s-sm);">one endpoint, one key</p>
+        </div>
+        <div class="terminal-card">
+          <div class="term-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+          <pre><code><span class="out">$</span> curl https://api.tensorai.com/v1/chat/completions \
+    -H <span class="out">"Authorization: Bearer $TENSORAI_API_KEY"</span> \
+    -d <span class="out">'{"model":"deepseek-v4-flash",
+         "messages":[{"role":"user",
+         "content":"Hello!"}]}'</span>
+
+<span class="cmt">→ streaming tokens in ~200ms</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY US ============ -->
+  <section id="why">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="display-lg">Built lean, on purpose</h2>
+        <p class="body-md">No layers, no sales funnel, no platform tax — just fast inference and a team that answers.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-item">
+          <h3 class="heading-md">Nimble team</h3>
+          <p class="body-sm">Three engineers in San Francisco. You talk to the people who run the stack — not a support tier.</p>
+        </div>
+        <div class="why-item">
+          <h3 class="heading-md">Quick setup</h3>
+          <p class="body-sm">Drop-in REST API. Set your base URL and key and you're live in minutes.</p>
+        </div>
+        <div class="why-item">
+          <h3 class="heading-md">Lightweight</h3>
+          <p class="body-sm">No SDK, no contracts, no lock-in. Use the models you want and leave whenever you like.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="display-lg">Pricing</h2>
+        <p class="body-md">Per 1M tokens, in US dollars. No minimums, no monthly fees — pay for what you send.</p>
+      </div>
+      <div class="table-scroll">
+        <table class="pricing">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th class="num">Input</th>
+              <th class="num">Output</th>
+              <th class="num">Cached</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="model">DeepSeek V3 0324</td><td class="num">$0.50</td><td class="num">$1.50</td><td class="num">$0.25</td></tr>
+            <tr><td class="model">DeepSeek V4 Pro</td><td class="num">$1.74</td><td class="num">$3.48</td><td class="num">$0.15</td></tr>
+            <tr><td class="model">DeepSeek V4 Flash</td><td class="num">$0.14</td><td class="num">$0.28</td><td class="num">$0.03</td></tr>
+            <tr><td class="model">Gemma 4 31B-it</td><td class="num">$0.14</td><td class="num">$0.40</td><td class="num">$0.14</td></tr>
+            <tr><td class="model">GLM 5.1</td><td class="num">$1.20</td><td class="num">$4.40</td><td class="num">$0.25</td></tr>
+            <tr><td class="model">GLM 5.2</td><td class="num">$1.40</td><td class="num">$4.40</td><td class="num">$0.26</td></tr>
+            <tr><td class="model">GPT-OSS 120B</td><td class="num">$0.05</td><td class="num">$0.20</td><td class="num">$0.05</td></tr>
+            <tr><td class="model">Kimi K2.6</td><td class="num">$0.70</td><td class="num">$3.50</td><td class="num">$0.35</td></tr>
+            <tr><td class="model">Llama 3.3 70B Instruct</td><td class="num">$0.25</td><td class="num">$0.75</td><td class="num">$0.13</td></tr>
+            <tr>
+              <td class="model">Nemotron 3 VoiceChat</td>
+              <td class="num"><a href="#contact">Contact</a></td>
+              <td class="num"><a href="#contact">Contact</a></td>
+              <td class="num"><a href="#contact">Contact</a></td>
+            </tr>
+            <tr><td class="model">Nemotron 3 Nano 30B-A3B-FP8</td><td class="num">$0.05</td><td class="num">$0.20</td><td class="num">$0.03</td></tr>
+            <tr><td class="model">Nemotron 3 Nano Omni 30B A3B Reasoning <span class="variant">(Text, Image, Video)</span></td><td class="num">$0.30</td><td class="num">$1.83</td><td class="num">$0.30</td></tr>
+            <tr><td class="model">Nemotron 3 Nano Omni 30B A3B Reasoning <span class="variant">(Audio)</span></td><td class="num">$0.50</td><td class="num">$1.83</td><td class="num">$0.50</td></tr>
+            <tr><td class="model">Nemotron 3 Super 120B-A12B-FP8</td><td class="num">$0.30</td><td class="num">$2.40</td><td class="num">$0.15</td></tr>
+            <tr><td class="model">Qwen3 235B A22B Instruct 2507</td><td class="num">$0.22</td><td class="num">$0.80</td><td class="num">$0.11</td></tr>
+            <tr><td class="model">Yutori n1.5</td><td class="num">$1.50</td><td class="num">$5.00</td><td class="num">$1.50</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="price-foot">Prices are $ per 1M tokens. Need a model you don't see here, or volume rates? <a href="#contact">Talk to us</a>.</p>
+    </div>
+  </section>
+
+  <!-- ============ DATA STAYS YOURS ============ -->
+  <section class="privacy">
+    <div class="wrap">
+      <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4" y="11" width="16" height="10" rx="2"/>
+        <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+      </svg>
+      <h2 class="heading-lg">Your data stays yours</h2>
+      <p class="body-md">We don't train on your prompts, log your completions, or sell anything to anyone. Requests are proxied straight to inference and discarded. The team running it is three people you can email.</p>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 class="display-lg">Frequently asked questions</h2>
+      </div>
+      <div class="faq">
+        <div class="faq-row">
+          <p class="q heading-sm">How do I connect?</p>
+          <p class="a body-md">Point any HTTP client at <code>https://api.tensorai.com/v1</code> and set your key. Chat completions, streaming, and tool calls all work as you'd expect over plain REST.</p>
+        </div>
+        <div class="faq-row">
+          <p class="q heading-sm">How does billing work?</p>
+          <p class="a body-md">Pay per token, metered per request — input, output, and cached reads priced separately as listed above. No minimums, no monthly platform fee. You can set a hard spend cap from the dashboard.</p>
+        </div>
+        <div class="faq-row">
+          <p class="q heading-sm">Where does inference run?</p>
+          <p class="a body-md">On data-center-grade GPUs we resell capacity from. You get competitive rates without standing up your own cluster, and we keep the routing thin so latency stays low.</p>
+        </div>
+        <div class="faq-row">
+          <p class="q heading-sm">Can I get a model that isn't listed?</p>
+          <p class="a body-md">Often, yes. If you need a specific open model or a private deployment, <a href="#contact">email us</a> — with three engineers, turnaround is usually days, not quarters.</p>
+        </div>
+        <div class="faq-row">
+          <p class="q heading-sm">Is there a contract or lock-in?</p>
+          <p class="a body-md">None. Generate a key, send requests, stop whenever. It's a standard HTTP endpoint, so switching away is just pointing your base URL elsewhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DARK CTA STRIP (single inverted moment) ============ -->
+  <section id="contact" style="padding-top: 0;">
+    <div class="wrap-wide">
+      <div class="cta-strip">
+        <div>
+          <h2 class="heading-lg">Get an API key</h2>
+          <p class="body-md">Live in minutes. Volume and custom-model requests welcome.</p>
+        </div>
+        <a class="btn btn-on-dark" href="#">Get started</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="foot-inner">
+      <a href="#">Get an API key</a>
+      <a href="#quickstart">Docs</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">GitHub</a>
+      <a href="#">Discord</a>
+      <a href="mailto:hello@tensorai.com">Contact</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <span class="copy">© 2026 TENSORAI · San Francisco</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // copy install command
+      var btn = document.getElementById('copy-btn');
+      var cmd = document.getElementById('install-cmd');
+      if (btn && cmd && navigator.clipboard) {
+        btn.addEventListener('click', function () {
+          navigator.clipboard.writeText(cmd.innerText);
+        });
+      }
+
+      // mobile nav dropdown
+      var toggle = document.getElementById('nav-toggle');
+      var menu = document.getElementById('mobile-menu');
+      if (toggle && menu) {
+        var setOpen = function (open) {
+          menu.classList.toggle('open', open);
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        };
+        toggle.addEventListener('click', function () {
+          setOpen(!menu.classList.contains('open'));
+        });
+        // close after tapping a link
+        menu.addEventListener('click', function (e) {
+          if (e.target.closest('a')) setOpen(false);
+        });
+        // reset if resized back up to desktop
+        window.addEventListener('resize', function () {
+          if (window.innerWidth > 768) setOpen(false);
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
