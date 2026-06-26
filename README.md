@@ -1,4 +1,4 @@
-# YOURCOMPANY — marketing site
+# YOURCOMPANY - marketing site
 
 A single-page, static marketing site for an LLM inference reselling startup,
 built on an Ollama-style **documentation-first** design system: paper-white
@@ -11,18 +11,18 @@ column. Plain HTML + CSS, no build step, no backend.
   `<script>` only wires the install-snippet copy button).
 - Webfonts (require a network connection on first load; they fall back to
   `system-ui` / monospace offline):
-  - **Clash Display** (600/700) — all headings: hero title, section headers,
+  - **Clash Display** (600/700) - all headings: hero title, section headers,
     card titles, FAQ questions. Loaded from **Fontshare** (`api.fontshare.com`),
     not Google Fonts.
-  - **DM Sans** (400–700) — body copy and the pricing numbers. From Google Fonts.
-  - **Space Mono** (700) — small uppercase structural labels: table column
+  - **DM Sans** (400–700) - body copy and the pricing numbers. From Google Fonts.
+  - **Space Mono** (700) - small uppercase structural labels: table column
     headers, the hero meta tag, footer links + copyright, and the running
     nav/footer chrome. Also carries the code in the install snippet and terminal
     mockup (at weight 400). From Google Fonts.
 
 ## Run it
 
-It's static — just open the file:
+It's static - just open the file:
 
 ```bash
 open index.html          # macOS
@@ -46,13 +46,13 @@ sed -i '' 's/YOURCOMPANY/Acme/g' index.html README.md
 
 Other things you'll likely want to change:
 
-- **Endpoint** — `https://api.YOURCOMPANY.com/v1` in the terminal mockup, FAQ, and command tag.
-- **Install command** — the `pip install ...` line in the hero install-snippet pill (`#install-cmd`).
-- **Contact email** — `hello@YOURCOMPANY.com` in the footer.
-- **CTAs** — the `Get an API key` / `Get started` buttons point to `#` placeholders.
-- **Pricing** — edit the rows in `<table class="pricing">`. Numbers live in
+- **Endpoint** - `https://api.YOURCOMPANY.com/v1` in the terminal mockup, FAQ, and command tag.
+- **Install command** - the `pip install ...` line in the hero install-snippet pill (`#install-cmd`).
+- **Contact email** - `hello@YOURCOMPANY.com` in the footer.
+- **CTAs** - the `Get an API key` / `Get started` buttons point to `#` placeholders.
+- **Pricing** - edit the rows in `<table class="pricing">`. Numbers live in
   `<td class="num">` cells; "Contact" rows use an inline `<a>` to `#contact`.
-- **Llama mascot** — inline `<svg class="llama">` in the nav and hero. Swap in your
+- **Llama mascot** - inline `<svg class="llama">` in the nav and hero. Swap in your
   own brand mark; it's the only illustration in the system.
 
 ## Design system
@@ -60,7 +60,7 @@ Other things you'll likely want to change:
 Documentation-first, geometric, single-surface. The full token set lives in the
 CSS `:root` block. Highlights:
 
-### Palette (black + white + grays only — no brand color)
+### Palette (black + white + grays only - no brand color)
 
 | Token            | Hex                   | Use                                   |
 |------------------|-----------------------|---------------------------------------|
@@ -82,7 +82,7 @@ CSS `:root` block. Highlights:
   (squared, not pill). The install snippet, search pill, and traffic-light dots
   stay fully rounded; cards use `12px`.
 - **No depth:** no shadows, no gradients. Surfaces are flat, or a 1px hairline
-  border, or the single `surface-dark` inversion — that's the entire elevation scale.
+  border, or the single `surface-dark` inversion - that's the entire elevation scale.
 - **Type ramp:** 36px Clash Display headline → 30/24px Clash section heads → 16px
   DM Sans body → 12px Space Mono uppercase labels. Tight, no marketing pyramid.
 - **Section rhythm:** 88px of plain white air between blocks, no decorative dividers.
