@@ -258,6 +258,9 @@
     .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-xl); }
     .why-item h3 { margin-bottom: var(--s-sm); }
     .why-item p { color: var(--body); }
+    .why-item:nth-child(1) { text-align: left; }
+    .why-item:nth-child(2) { text-align: center; }
+    .why-item:nth-child(3) { text-align: right; }
 
     /* ---------- pricing table ---------- */
     .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -317,6 +320,8 @@
     /* ---------- responsive ---------- */
     @media (max-width: 850px) {
       .why-grid { grid-template-columns: 1fr; gap: var(--s-xxl); text-align: center; }
+      /* when stacked, re-center all items (overrides the per-item alignment above) */
+      .why-item:nth-child(1), .why-item:nth-child(2), .why-item:nth-child(3) { text-align: center; }
       .split { grid-template-columns: 1fr; gap: var(--s-xxl); }
     }
 
